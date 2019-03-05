@@ -18,6 +18,8 @@
 
 @end
 
+ActionViewController * actionViewController = nil;
+
 @implementation ActionViewController
 
 - (void)loadView {
@@ -32,7 +34,7 @@
                                                    launchOptions:nil];
   rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:0.0f blue:0.0f alpha:0.3];
   self.view = rootView;
-//  actionViewController = self;
+  actionViewController = self;
 }
 
 - (IBAction)done {

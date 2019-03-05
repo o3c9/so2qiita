@@ -8,31 +8,63 @@
  */
 
 import React, { Component } from "react";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Button, NativeModules } from "react-native";
 
-const instructions = Platform.select({
-  ios: "Press Cmd+R to reload,\n" + "Cmd+D or shake for dev menu",
-  android:
-    "Double tap R on your keyboard to reload,\n" +
-    "Shake or press menu button for dev menu"
-});
-
-type Props = {};
-export default class App extends Component<Props> {
+class ContainerApp extends Component {
   render() {
-    const { isExtension } = this.props;
-    let message;
-    if (isExtension) {
-      message = "Welcome to So2QiitaExt on React Native!";
-    } else {
-      message = "Welcome to So2Qiita on React Native!";
-    }
-
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>{message}</Text>
+        <Text style={styles.welcome}>Welcome to So2Qiita on React Native!</Text>
       </View>
     );
+  }
+}
+
+class Extension extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoading: true,
+      url: "",
+      error: null,
+    };
+    this._onPress = this._onPress.bind(this);
+  }
+
+  componentDidMount() {
+    try {
+      const url = await NativeModules.ActionExtension.url();
+      this.setState({ isLoading: false, url });
+    } catch (error) {
+      this.setState({ isLoading: false, error });
+    }
+  }
+
+  _onPress() {
+    NativeModules.ActionExtension.done();
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.welcome}>
+          Welcome to So2QiitaExt on React Native!
+        </Text>
+        <Button onPress={this._onPress} title="Done" />
+        {this.state.error && <Text style={styles.error}>{this.state.error}</Text>}
+      </View>
+    );
+  }
+}
+
+export default class App extends Component {
+  render() {
+    const { isExtension } = this.props;
+    if (isExtension) {
+      return <Extension />;
+    } else {
+      return <ContainerApp />;
+    }
   }
 }
 
