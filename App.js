@@ -8,14 +8,23 @@
  */
 
 import React, { Component } from "react";
-import { StyleSheet, Text, View, Button, NativeModules } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  ActivityIndicator,
+  NativeModules,
+  SafeAreaView
+} from "react-native";
+import NavigationBar from "react-native-navbar";
+import { WebView } from "react-native-webview";
+import StackOverflow from "./StackOverflow";
 
 class ContainerApp extends Component {
   render() {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <Text style={styles.welcome}>Welcome to So2Qiita on React Native!</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 }
@@ -25,16 +34,18 @@ class Extension extends Component {
     super(props);
     this.state = {
       isLoading: true,
-      url: "",
-      error: null,
+      uri: "",
+      error: null
     };
-    this._onPress = this._onPress.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     try {
       const url = await NativeModules.ActionExtension.url();
-      this.setState({ isLoading: false, url });
+      const tags = await new StackOverflow(url).getTags();
+      const query = encodeURIComponent(tags.map(t => `tag:${t}`).join(" "));
+      const uri = `https://qiita.com/search?utf8=%E2%9C%93&q=${query}`;
+      this.setState({ isLoading: false, uri });
     } catch (error) {
       this.setState({ isLoading: false, error });
     }
@@ -45,15 +56,31 @@ class Extension extends Component {
   }
 
   render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to So2QiitaExt on React Native!
-        </Text>
-        <Button onPress={this._onPress} title="Done" />
-        {this.state.error && <Text style={styles.error}>{this.state.error}</Text>}
-      </View>
-    );
+    const { isLoading, uri, error } = this.state;
+
+    if (isLoading) {
+      return (
+        <SafeAreaView style={styles.container}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </SafeAreaView>
+      );
+    } else if (uri) {
+      return (
+        <SafeAreaView style={styles.extension}>
+          <NavigationBar
+            title={{ title: "So2QiitaExt" }}
+            leftButton={{ title: "Done", handler: this._onPress }}
+          />
+          <WebView style={styles.webview} source={{ uri }} />
+        </SafeAreaView>
+      );
+    } else {
+      return (
+        <SafeAreaView style={styles.container}>
+          <Text style={styles.error}>{error}</Text>
+        </SafeAreaView>
+      );
+    }
   }
 }
 
@@ -75,6 +102,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#F5FCFF"
   },
+  extension: {
+    flex: 1,
+    backgroundColor: "#F5FCFF"
+  },
   welcome: {
     fontSize: 20,
     textAlign: "center",
@@ -84,5 +115,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#333333",
     marginBottom: 5
+  },
+  error: {
+    color: "red",
+    marginBottom: 5
+  },
+  webview: {
+    marginTop: 5
   }
 });

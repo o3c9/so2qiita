@@ -10,6 +10,7 @@
 
 @interface RCT_EXTERN_MODULE(ActionExtension, NSObject)
 
+RCT_EXTERN_METHOD(url: (RCTPromiseResolveBlock)resolve rejecter: (RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(done)
 
 @end
