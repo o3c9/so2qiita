@@ -7,8 +7,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "react": "16.6.3",
-    "react-native": "0.58.6",
+    "react-native": "0.62.1",
     "react-native-navbar": "^2.1.0",
     "react-native-webview": "^5.2.4"
   },
