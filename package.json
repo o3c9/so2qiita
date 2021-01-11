@@ -7,9 +7,10 @@
     "test": "jest"
   },
   "dependencies": {
-    "react-native": "0.62.1",
+    "react": "16.6.3",
+    "react-native": "0.63.4",
     "react-native-navbar": "^2.1.0",
-    "react-native-webview": "^5.2.4"
+    "react-native-webview": "^11.0.2"
   },
   "devDependencies": {
     "babel-core": "^7.0.0-bridge.0",
